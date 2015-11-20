@@ -14,7 +14,9 @@ end
 Then /I should see "(.*)" before "(.*)"/ do |e1, e2|
   #  ensure that that e1 occurs before e2.
   #  page.body is the entire content of the page as a string.
-  fail "Unimplemented"
+  before = get_movie_potition(e1)
+  after = get_movie_potition(e2)
+  expect(before + 1 == after).to eq true
 end
 
 # Make it easier to express checking or unchecking several boxes at once
@@ -31,4 +33,12 @@ end
 Then /I should see all the movies/ do
   # Make sure that all the movies in the app are visible in the table
   expect(10 == Movie.all.count).to be true
+end
+
+def get_movie_potition(movie)
+  page.all('#movies tr').each_with_index do |tr, index|
+    row = tr.all('td')
+    next if row.empty?
+    return index if (movie == tr.all('td')[0].text)
+  end
 end
