@@ -86,8 +86,20 @@ When /^(?:|I )select "([^"]*)" from "([^"]*)"$/ do |value, field|
   select(value, :from => field)
 end
 
+When /^(?:|I )check the following ratings:$/ do |ratings_table|
+  ratings_table.hashes.each do |item|
+    check("ratings_#{item['rating']}")
+  end
+end
+
 When /^(?:|I )check "([^"]*)"$/ do |field|
   check(field)
+end
+
+When /^(?:|I )uncheck the following ratings:$/ do |ratings_table|
+  ratings_table.hashes.each do |item|
+    uncheck("ratings_#{item['rating']}")
+  end
 end
 
 When /^(?:|I )uncheck "([^"]*)"$/ do |field|
@@ -110,6 +122,18 @@ Then /^(?:|I )should see "([^"]*)"$/ do |text|
   end
 end
 
+Then /^(?:|I )should see the following movies:$/ do |movies_table|
+  movies_table.hashes.each do |movie|
+    regexp = Regexp.new(movie['title'])
+
+    if page.respond_to? :should
+      page.should have_xpath('//*', :text => regexp)
+    else
+      page.has_xpath?('//*', :text => regexp)
+    end
+  end
+end
+
 Then /^(?:|I )should see \/([^\/]*)\/$/ do |regexp|
   regexp = Regexp.new(regexp)
 
@@ -117,6 +141,18 @@ Then /^(?:|I )should see \/([^\/]*)\/$/ do |regexp|
     page.should have_xpath('//*', :text => regexp)
   else
     assert page.has_xpath?('//*', :text => regexp)
+  end
+end
+
+Then /^(?:|I )should not see the following movies:$/ do |movies_table|
+  movies_table.hashes.each do |movie|
+    regexp = Regexp.new(movie['title'])
+
+    if page.respond_to? :should
+      page.should have_no_xpath('//*', :text => regexp)
+    else
+      assert page.has_no_xpath?('//*', :text => regexp)
+    end
   end
 end
 
